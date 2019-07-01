@@ -4,6 +4,7 @@ import cn.edu.bupt.ZigbeeMapper.data.Device;
 
 import cn.edu.bupt.ZigbeeMapper.data.DeviceTokenRelation;
 import cn.edu.bupt.ZigbeeMapper.data.Gateway;
+import cn.edu.bupt.ZigbeeMapper.mqtt.Config;
 import cn.edu.bupt.ZigbeeMapper.mqtt.DataMessageClient;
 import cn.edu.bupt.ZigbeeMapper.service.DeviceTokenRelationService;
 import cn.edu.bupt.ZigbeeMapper.transform.OutBoundHandler;
@@ -277,7 +278,7 @@ public class GatewayMethodImpl extends OutBoundHandler implements GatewayMethod 
     //设备回调
     @Override
     public void device_CallBack(Device device, String IP, DeviceTokenRelationService deviceTokenRelationService) throws Exception {
-        DeviceTokenRelation deviceTokenRelation = deviceTokenRelationService.getRelotionByIEEEAndEndPoint(device.getIEEE(), Integer.parseInt(String.valueOf(device.getEndpoint())));
+        DeviceTokenRelation deviceTokenRelation = deviceTokenRelationService.getRelotionByShortAddressAndEndPoint(device.getShortAddress(), Integer.parseInt(String.valueOf(device.getEndpoint())));
 //        System.out.println("deviceTokenRelation:" + device + ",IP:" + IP);
         if (deviceTokenRelation == null) {
             String type = Tool.deviceId2Type(device.getDeviceId());
@@ -321,14 +322,17 @@ public class GatewayMethodImpl extends OutBoundHandler implements GatewayMethod 
 
     //设备状态回调
     @Override
-    public void deviceState_CallBack(Device device) {
-        System.out.println(device.getShortAddress() + "-" + device.getEndpoint() + ":" + device.getState());
+    public void deviceState_CallBack(Device device,DeviceTokenRelationService deviceTokenRelationService) {
+        DeviceTokenRelation deviceTokenRelation = deviceTokenRelationService.getRelotionByShortAddressAndEndPoint(device.getShortAddress(), Integer.parseInt(String.valueOf(device.getEndpoint())));
+//        System.out.println(device.getShortAddress() + "-" + device.getEndpoint() + ":" + device.getState());
         try {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("status", device.getState());
 
+            System.out.println(device.getIEEE());
             //System.out.println(jsonObject.toString());
-            DataMessageClient.publishData(jsonObject.toString());
+            String topic = Config.DeviceETPrefix + deviceTokenRelation.getIEEE() + Config.DeviceETStateUpdateSuffix;
+            DataMessageClient.publishData(topic,jsonObject.toString());
         } catch (Exception e) {
             System.out.println("数据表中无对应token" + e);
         }
@@ -339,10 +343,11 @@ public class GatewayMethodImpl extends OutBoundHandler implements GatewayMethod 
         System.out.println(device.toString() + "data: "+ data               );
     }
 
-//    @Override
-//    public void data_CallBack(String shortAddress, int endPoint, JsonObject data, DeviceTokenRelationService deviceTokenRelationService, SceneService sceneService, SceneRelationService sceneRelationService, GatewayGroupService gatewayGroupService) throws Exception {
-//        DeviceTokenRelation deviceTokenRelation = deviceTokenRelationService.getRelotionBySAAndEndPoint(shortAddress, endPoint);
-//        try{
+
+    @Override
+    public void data_CallBack(String shortAddress, int endPoint, JsonObject data, DeviceTokenRelationService deviceTokenRelationService) throws Exception {
+        DeviceTokenRelation deviceTokenRelation = deviceTokenRelationService.getRelotionByShortAddressAndEndPoint(shortAddress, endPoint);
+        try{
 //            String sceneId = data.get("sceneId").getAsString();
 //            String gatewayName = deviceTokenRelation.getGatewayName();
 //            Scene mainScene = sceneService.getSceneByGatewayAndSceneId(gatewayName, sceneId);
@@ -353,21 +358,22 @@ public class GatewayMethodImpl extends OutBoundHandler implements GatewayMethod 
 //                GatewayMethod gatewayMethod = new GatewayMethodImpl();
 //                gatewayMethod.callScene(sideScene.getSceneId(), gatewayGroup.getIp());
 //            }
-//            return;
-//
-//
-//        }catch (NullPointerException e){
-//
-//        }
-//
-//        if(deviceTokenRelation!=null) {
+            return;
+
+
+        }catch (NullPointerException e){
+
+        }
+
+        if(deviceTokenRelation!=null) {
+            String topic = Config.DeviceETPrefix + deviceTokenRelation.getIEEE() + Config.DeviceETStateUpdateSuffix;
 //            List<DeviceTokenRelation> deviceTokenRelations = deviceTokenRelationService.getRelationByIEEE(deviceTokenRelation.getIEEE());
 //            for (DeviceTokenRelation deviceTokenRelation1 : deviceTokenRelations) {
-//                String jsonStr = data.toString();
-//                DataMessageClient.publishData(deviceTokenRelation1.getToken(), jsonStr);
+                String jsonStr = data.toString();
+                DataMessageClient.publishData(topic, jsonStr);
 //            }
-//        }
-//    }
+        }
+    }
 
 
 }

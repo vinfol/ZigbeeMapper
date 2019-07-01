@@ -14,8 +14,8 @@ public interface DeviceTokenRelationMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     Integer addARelation(DeviceTokenRelation deviceTokenRelation);
 
-    @Select("SELECT * FROM deviceTokenRelation WHERE IEEE = #{IEEE} AND endPoint = #{endPoint}")
-    DeviceTokenRelation getRelotionByIEEEAndEndPoint(@Param("IEEE") String IEEE, @Param("endPoint") Integer endPoint);
+    @Select("SELECT * FROM deviceTokenRelation WHERE IEEE = #{shortAddress} AND endPoint = #{endPoint}")
+    DeviceTokenRelation getRelotionByShortAddressAndEndPoint(@Param("shortAddress") String shortAddress, @Param("endPoint") Integer endPoint);
 
 //    @Select("SELECT * FROM deviceTokenRelation WHERE gatewayIP = #{gatewayIP} AND endPoint = #{endPoint}")
 //    DeviceTokenRelation getRelotionByGatewayNameAndEndPoint(@Param("gatewayIP") String gatewayIP, @Param("endPoint") Integer endPoint);

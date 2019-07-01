@@ -11,8 +11,8 @@ public class DeviceTokenRelationService {
     @Autowired
     private DeviceTokenRelationMapper deviceTokenRelationMapper;
 
-    public DeviceTokenRelation getRelotionByIEEEAndEndPoint(String IEEE, Integer endPoint){
-        return deviceTokenRelationMapper.getRelotionByIEEEAndEndPoint(IEEE, endPoint);
+    public DeviceTokenRelation getRelotionByShortAddressAndEndPoint(String shortAddress, Integer endPoint){
+        return deviceTokenRelationMapper.getRelotionByShortAddressAndEndPoint(shortAddress, endPoint);
     }
 
     public Boolean addARelation(DeviceTokenRelation deviceTokenRelation){

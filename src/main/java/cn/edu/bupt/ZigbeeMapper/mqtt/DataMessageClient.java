@@ -18,7 +18,7 @@ public class DataMessageClient {
         }
 
     }
-    public static synchronized void publishData(String data) throws  Exception{
+    public static synchronized void publishData(String topic,String data) throws  Exception{
         MqttConnectOptions options = new MqttConnectOptions();
         options.setCleanSession(true);
 //        options.setUserName(token);
@@ -27,21 +27,21 @@ public class DataMessageClient {
         MqttMessage msg = new MqttMessage(data.getBytes());
         msg.setRetained(false);
         msg.setQos(0);
-        client.publish(Config.datatopic, msg);
+        client.publish(topic, msg);
         client.disconnect();
     }
-
-    public static synchronized  void publishAttribute(String data)throws  Exception{
-        MqttConnectOptions options = new MqttConnectOptions();
-        options.setCleanSession(true);
-//        options.setUserName(token);
-        options.setConnectionTimeout(10);
-        client.connect(options);
-
-        MqttMessage msg = new MqttMessage(data.getBytes());
-        msg.setRetained(false);
-        msg.setQos(0);
-        client.publish(Config.attributetopic, msg);
-        client.disconnect();
-    }
+//
+//    public static synchronized  void publishAttribute(String topic,String data)throws  Exception{
+//        MqttConnectOptions options = new MqttConnectOptions();
+//        options.setCleanSession(true);
+////        options.setUserName(token);
+//        options.setConnectionTimeout(10);
+//        client.connect(options);
+//
+//        MqttMessage msg = new MqttMessage(data.getBytes());
+//        msg.setRetained(false);
+//        msg.setQos(0);
+//        client.publish(topic, msg);
+//        client.disconnect();
+//    }
 }

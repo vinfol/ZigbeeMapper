@@ -12,13 +12,13 @@ public class Config {
     public static String TwinETGetResultSuffix     = "/twin/get/result";
     public static String TwinETGetSuffix           = "/twin/get";
 
-//    $hw/events/device/+/twin/#
-
-
-    public static String RPC_TOPIC = "v1/devices/me/rpc/request/+";
-    public static String datatopic = "v1/devices/me/telemetry";
-    public static String attributetopic = "v1/devices/me/attributes";
-    public static String RPC_RESPONSE_TOPIC = "v1/devices/me/rpc/response/";
+////    $hw/events/device/+/twin/#
+//
+//
+//    public static String RPC_TOPIC = "v1/devices/me/rpc/request/+";
+//    public static String datatopic = "v1/devices/me/telemetry";
+//    public static String attributetopic = "v1/devices/me/attributes";
+//    public static String RPC_RESPONSE_TOPIC = "v1/devices/me/rpc/response/";
 
 
 }

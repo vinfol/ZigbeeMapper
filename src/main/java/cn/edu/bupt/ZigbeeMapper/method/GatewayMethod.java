@@ -3,6 +3,7 @@ package cn.edu.bupt.ZigbeeMapper.method;
 import cn.edu.bupt.ZigbeeMapper.data.Device;
 import cn.edu.bupt.ZigbeeMapper.data.Gateway;
 import cn.edu.bupt.ZigbeeMapper.service.DeviceTokenRelationService;
+import com.google.gson.JsonObject;
 
 public interface GatewayMethod {
   void getAllDevice(String IP) throws Exception;
@@ -162,7 +163,7 @@ public interface GatewayMethod {
 
   void gateway_CallBack(Gateway gateway);
 
-  void deviceState_CallBack(Device device);
+  void deviceState_CallBack(Device device,DeviceTokenRelationService deviceTokenRelationService);
 
 //  void deviceBright_CallBack(String shortAddress, int endPoint, int bright);
 //
@@ -216,5 +217,5 @@ public interface GatewayMethod {
 //
 //  void setColorTemperature_CallBack();
 //
-//  void data_CallBack(Device device) throws Exception;
+  void data_CallBack(String shortAddress, int endPoint, JsonObject data, DeviceTokenRelationService deviceTokenRelationService) throws Exception;
 }

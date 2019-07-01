@@ -31,11 +31,11 @@ public class DataService {
     int taskNameLength;
 
     public void resolution(byte[] bytes,String IP,DeviceTokenRelationService deviceTokenRelationService) throws Exception {
-        System.out.println("进入");
+//        System.out.println("进入");
         byte Response = bytes[0];
         switch (Response) {
             case 0x01:
-//                System.out.println(Tool.bytesToHexString(bytes));
+                System.out.println("0x01");
                 Device device = new Device();
                 length = Integer.parseInt(String.valueOf(bytes[1]));
                 device.setShortAddress(byte2HexStr(Arrays.copyOfRange(bytes, 2, 4)));
@@ -63,6 +63,7 @@ public class DataService {
                 gatewayMethod.device_CallBack(device,IP,deviceTokenRelationService);
                 break;
             case 0x15:
+                System.out.println("0x15");
                 Gateway gateway = new Gateway();
                 length = Integer.parseInt(String.valueOf(bytes[1]));
                 gateway.setVersion(bytesToAscii(Arrays.copyOfRange(bytes, 2, 7)));
@@ -75,16 +76,59 @@ public class DataService {
                 gateway.setSceneNumber(Integer.parseInt(String.valueOf(bytes[54])));
                 gateway.setMissionNumber(Integer.parseInt(String.valueOf(bytes[55])));
                 gateway.setCompileVersionNumber(byte2HexStr(Arrays.copyOfRange(bytes, 61, 65)));
-                System.out.println("完成解析");
+//                System.out.println("完成解析");
                 gatewayMethod.gateway_CallBack(gateway);
                 break;
             case 0x07:
+//                System.out.println("0x07");
+                Device stateDevice = new Device();
+                length = Integer.parseInt(String.valueOf(bytes[1]));
+                stateDevice.setShortAddress(byte2HexStr(Arrays.copyOfRange(bytes, 2, 4)));
+                stateDevice.setEndpoint(bytes[4]);
+                stateDevice.setState(bytes[5]==0x01);
+//                System.out.println("完成解析");
+                gatewayMethod.deviceState_CallBack(stateDevice,deviceTokenRelationService);
+                break;
+            case 0x08:
+                System.out.println("0x08");
+                length = Integer.parseInt(String.valueOf(bytes[1]));
+                shortAddress = byte2HexStr(Arrays.copyOfRange(bytes, 2, 4));
+                endPoint = Integer.parseInt(String.valueOf(bytes[4]));
+                int bright = Integer.parseInt(String.valueOf(bytes[5]));
+//                System.out.println("完成解析");
+//                gatewayMethod.deviceBright_CallBack(shortAddress, endPoint, bright);
                 break;
             case 0x09:
+                System.out.println("0x09");
+                length = Integer.parseInt(String.valueOf(bytes[1]));
+                shortAddress = byte2HexStr(Arrays.copyOfRange(bytes, 2, 4));
+                endPoint = Integer.parseInt(String.valueOf(bytes[4]));
+                int hue = Integer.parseInt(String.valueOf(bytes[5]));
+//                System.out.println("完成解析");
+//                gatewayMethod.deviceBright_CallBack(shortAddress, endPoint, hue);
                 break;
             case 0x0A:
+                System.out.println("0x0A");
+                length = Integer.parseInt(String.valueOf(bytes[1]));
+                shortAddress = byte2HexStr(Arrays.copyOfRange(bytes, 2, 4));
+                endPoint = Integer.parseInt(String.valueOf(bytes[4]));
+                int saturation = Integer.parseInt(String.valueOf(bytes[5]));
+//                System.out.println("完成解析");
+//                gatewayMethod.deviceBright_CallBack(shortAddress, endPoint, saturation);
                 break;
             case 0x0B:
+                System.out.println("0x0B");
+                length = Integer.parseInt(String.valueOf(bytes[1]));
+                String groupId = byte2HexStr(Arrays.copyOfRange(bytes, 2, 4));
+                int memberLength = Integer.parseInt(String.valueOf(bytes[4]));
+                shortAddresses = new String[memberLength];
+                endPoints = new int[memberLength];
+                for(int i=0;i<memberLength;i++){
+                    shortAddresses[i] =  byte2HexStr(Arrays.copyOfRange(bytes, 5+3*i, 7+3*i));
+                    endPoints[i] = Integer.parseInt(String.valueOf(bytes[7+3*i]));
+                }
+                System.out.println("完成解析");
+//                gatewayMethod.groupMember_CallBack(groupId, shortAddresses, endPoints);
                 break;
             case 0x0C:
                 break;
@@ -103,12 +147,80 @@ public class DataService {
             case 0x25:
                 break;
             case 0x27:
+                System.out.println("0x27");
+                length = Integer.parseInt(String.valueOf(bytes[1]));
+                shortAddress = byte2HexStr(Arrays.copyOfRange(bytes, 2, 4));
+                endPoint = Integer.parseInt(String.valueOf(bytes[4]));
+                int colourTemp = (int) ((bytes[5] & 0xFF) | ((bytes[6] & 0xFF)<<8));
+
+//                System.out.println("完成解析");
+//                gatewayMethod.deviceColourTemp_CallBack(shortAddress, endPoint, colourTemp);
                 break;
             case 0x29:
+                System.out.println("0x29");
+                length = Integer.parseInt(String.valueOf(bytes[1]));
+                switch(bytes[2]){
+                    // 更改设备名返回值
+                    case 0x03:
+                        shortAddress = byte2HexStr(Arrays.copyOfRange(bytes, 4, 6));
+                        endPoint = Integer.parseInt(String.valueOf(bytes[6]));
+                        String name = bytesToAscii(bytes, 8, Integer.parseInt(String.valueOf(bytes[7])));
+
+//                        System.out.println("完成解析");
+//                        gatewayMethod.changeDeviceName_CallBack(shortAddress, endPoint, name);
+                        break;
+
+                    case 0x04:
+                        if (bytes[2] == (byte)0xa7){
+                            System.out.println("查询网关内保存的红外数据返回");
+                        }
+                        switch(bytes[3]){
+                            case (byte) 0x95:
+//                                gatewayMethod.deleteDevice_CallBack();
+                                break;
+                            case (byte) 0x82:
+                                gatewayMethod.setDeviceState_CallBack();
+                                break;
+                            case (byte) 0x83:
+//                                gatewayMethod.setDeviceLevel_CallBack();
+                                break;
+                            case (byte) 0x84:
+//                                gatewayMethod.setDeviceHueAndSat_CallBack();
+                                break;
+                            case (byte) 0x92:
+//                                gatewayMethod.callScene_CallBack();
+                                break;
+                            case (byte) 0x9E:
+//                                gatewayMethod.setReportTime_CallBack();
+                                break;
+                            case (byte) 0xA7:
+                                if (bytes[5] == (byte)0x01){
+                                    System.out.println("透传超时");
+                                }
+                                break;
+                            case (byte) 0xA8:
+//                                gatewayMethod.setColorTemperature_CallBack();
+                                break;
+                            case (byte) 0x89:
+//                                gatewayMethod.setSwitchBindDevice_CallBack();
+                        }
+                        break;
+
+                    case (byte)0x93:
+                        device = new Device();
+                        device.setShortAddress(byte2HexStr(new byte[]{bytes[5], bytes[6]}));
+                        device.setEndpoint(bytes[7]);
+                        byte[] data = new byte[4];
+                        System.arraycopy(bytes, 8, data, 0, 4);
+                        String dataStr = byte2HexStr(data);
+                        gatewayMethod.getDeviceInfo_CallBack(device, dataStr);
+                        break;
+                }
                 break;
             case (byte) 0x31:
             case (byte) 0xAF:
             case 0x70:
+//                System.out.println("0x70");
                 Double temperature;
                 Integer humidity;
                 Integer pm;
@@ -377,6 +489,8 @@ public class DataService {
                             // ZoneID
                             byte zone_id = bytes[15+password_length];
                         }
+                        System.out.println("data:" + data);
+                        gatewayMethod.data_CallBack(shortAddress,endPoint,data,deviceTokenRelationService);
                         break;
                 }
 //                System.out.println(data);
